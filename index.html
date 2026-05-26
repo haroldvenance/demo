@@ -1,0 +1,898 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); background: transparent; }
+
+  .demo-shell {
+    display: flex;
+    gap: 32px;
+    padding: 1.5rem 0;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .phone-frame {
+    width: 300px;
+    min-width: 280px;
+    background: #1a1a2e;
+    border-radius: 40px;
+    padding: 14px 10px;
+    box-shadow: 0 0 0 2px #333, inset 0 0 0 1px #444;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .phone-notch {
+    width: 80px;
+    height: 20px;
+    background: #1a1a2e;
+    border-radius: 0 0 14px 14px;
+    margin: 0 auto 8px;
+    position: relative;
+    z-index: 10;
+  }
+  .phone-notch::before {
+    content: '';
+    display: block;
+    width: 10px; height: 10px;
+    background: #2a2a3e;
+    border-radius: 50%;
+    margin: 4px auto 0;
+  }
+  .phone-screen {
+    background: #f7f8fa;
+    border-radius: 28px;
+    overflow: hidden;
+    height: 560px;
+    position: relative;
+  }
+
+  .screen { display: none; height: 100%; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  .status-bar {
+    background: #1E5F3E;
+    color: white;
+    font-size: 10px;
+    padding: 5px 18px 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .app-header {
+    background: #1E5F3E;
+    color: white;
+    padding: 12px 16px 16px;
+    flex-shrink: 0;
+  }
+  .app-header h1 { font-size: 18px; font-weight: 500; }
+  .app-header p { font-size: 11px; opacity: 0.8; margin-top: 2px; }
+
+  .screen-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+    background: #f0f4f2;
+  }
+
+  .greeting-card {
+    background: linear-gradient(135deg, #1E5F3E, #2d8a5c);
+    border-radius: 16px;
+    padding: 14px;
+    color: white;
+    margin-bottom: 12px;
+  }
+  .greeting-card h2 { font-size: 14px; font-weight: 500; }
+  .greeting-card p { font-size: 11px; opacity: 0.85; margin-top: 3px; }
+  .greeting-card .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.22);
+    border-radius: 20px;
+    font-size: 10px;
+    padding: 3px 10px;
+    margin-top: 8px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 12px 0 8px;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 10px; }
+
+  .feature-card {
+    background: white;
+    border-radius: 14px;
+    padding: 12px 10px;
+    text-align: center;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: border-color 0.15s;
+  }
+  .feature-card:hover { border-color: #1E5F3E; }
+  .feature-card .icon { font-size: 22px; margin-bottom: 5px; }
+  .feature-card .label { font-size: 10px; color: #444; font-weight: 500; line-height: 1.3; }
+
+  .list-card {
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .list-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 0.5px solid #f0f0f0;
+    cursor: pointer;
+  }
+  .list-item:last-child { border-bottom: none; }
+  .list-item .li-icon {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .li-green { background: #e8f5ee; }
+  .li-blue { background: #e8eef8; }
+  .li-orange { background: #fff3e8; }
+  .li-red { background: #feeaed; }
+  .list-item .li-text { flex: 1; }
+  .list-item .li-title { font-size: 12px; font-weight: 500; color: #222; }
+  .list-item .li-sub { font-size: 10px; color: #888; margin-top: 1px; }
+  .list-item .li-arrow { font-size: 14px; color: #ccc; }
+
+  .pill-tag {
+    display: inline-block;
+    background: #e8f5ee;
+    color: #1E5F3E;
+    font-size: 10px;
+    border-radius: 20px;
+    padding: 3px 8px;
+    font-weight: 500;
+  }
+
+  .bottom-nav {
+    background: white;
+    border-top: 0.5px solid #e0e0e0;
+    display: flex;
+    padding: 6px 0 10px;
+    flex-shrink: 0;
+  }
+  .nav-item {
+    flex: 1;
+    text-align: center;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+  .nav-item .nav-icon { font-size: 18px; color: #bbb; }
+  .nav-item .nav-label { font-size: 9px; color: #bbb; margin-top: 2px; }
+  .nav-item.active .nav-icon,
+  .nav-item.active .nav-label { color: #1E5F3E; }
+  .nav-dot {
+    width: 4px; height: 4px;
+    background: #1E5F3E;
+    border-radius: 50%;
+    margin: 2px auto 0;
+    display: none;
+  }
+  .nav-item.active .nav-dot { display: block; }
+
+  .consult-slot {
+    background: white;
+    border-radius: 12px;
+    padding: 11px 13px;
+    margin-bottom: 7px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+  .consult-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: #1E5F3E;
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 500;
+    flex-shrink: 0;
+  }
+  .consult-info { flex: 1; }
+  .consult-name { font-size: 12px; font-weight: 500; color: #222; }
+  .consult-spec { font-size: 10px; color: #888; }
+  .consult-time { font-size: 10px; color: #1E5F3E; font-weight: 500; }
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    flex-shrink: 0;
+  }
+
+  .map-placeholder {
+    background: #dde8df;
+    border-radius: 14px;
+    height: 130px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+  .map-grid {
+    position: absolute; inset: 0;
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.35) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.35) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .map-pin {
+    position: absolute;
+    font-size: 20px;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+  }
+  .map-label {
+    position: absolute;
+    bottom: 8px; left: 10px;
+    font-size: 10px;
+    background: rgba(0,0,0,0.55);
+    color: white;
+    padding: 3px 8px;
+    border-radius: 20px;
+  }
+
+  .challenge-card {
+    background: linear-gradient(135deg, #E86A1E, #f0944a);
+    border-radius: 14px;
+    padding: 13px;
+    color: white;
+    margin-bottom: 8px;
+  }
+  .challenge-card h3 { font-size: 13px; font-weight: 500; }
+  .challenge-card p { font-size: 10px; opacity: 0.9; margin-top: 3px; }
+  .progress-bar {
+    background: rgba(255,255,255,0.3);
+    border-radius: 10px;
+    height: 6px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  .progress-fill { height: 100%; background: white; border-radius: 10px; }
+  .progress-meta { display: flex; justify-content: space-between; font-size: 9px; opacity: 0.85; margin-top: 4px; }
+
+  .reminder-pill {
+    background: white;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 7px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .reminder-pill .r-icon {
+    width: 32px; height: 32px;
+    background: #e8f5ee;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .reminder-pill .r-info { flex: 1; }
+  .reminder-pill .r-name { font-size: 12px; font-weight: 500; color: #222; }
+  .reminder-pill .r-time { font-size: 10px; color: #888; }
+  .reminder-pill .r-check {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid #1E5F3E;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    color: #1E5F3E;
+  }
+  .r-done { background: #1E5F3E !important; border-color: #1E5F3E !important; color: white !important; }
+
+  .nav-panel {
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+  .nav-panel-title { font-size: 13px; font-weight: 500; margin-bottom: 10px; color: #222; }
+
+  .imc-display {
+    text-align: center;
+    background: linear-gradient(135deg, #1E5F3E, #2d8a5c);
+    border-radius: 14px;
+    padding: 16px;
+    color: white;
+    margin-bottom: 10px;
+  }
+  .imc-value { font-size: 36px; font-weight: 500; }
+  .imc-label { font-size: 11px; opacity: 0.85; }
+  .imc-status { display: inline-block; background: rgba(255,255,255,0.2); border-radius: 20px; padding: 3px 12px; font-size: 11px; margin-top: 6px; }
+
+  .side-info {
+    width: 300px;
+    min-width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .info-card {
+    background: var(--color-background-primary);
+    border: 0.5px solid var(--color-border-tertiary);
+    border-radius: var(--border-radius-lg);
+    padding: 1rem 1.25rem;
+  }
+  .info-card-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .info-card-title i { font-size: 16px; color: #1E5F3E; }
+  .info-point {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    margin-bottom: 7px;
+  }
+  .info-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #1E5F3E;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+  .info-point span { font-size: 12px; color: var(--color-text-secondary); line-height: 1.5; }
+
+  .screen-nav-btns {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px;
+  }
+  .snav-btn {
+    background: transparent;
+    border: 1px solid #1E5F3E;
+    color: #1E5F3E;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 11px;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .snav-btn.active-s { background: #1E5F3E; color: white; }
+
+  .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .kpi-box {
+    background: var(--color-background-secondary);
+    border-radius: var(--border-radius-md);
+    padding: 10px 12px;
+    text-align: center;
+  }
+  .kpi-box .kv { font-size: 20px; font-weight: 500; color: #1E5F3E; }
+  .kpi-box .kl { font-size: 10px; color: var(--color-text-secondary); margin-top: 2px; }
+</style>
+
+<h2 class="sr-only">Démo interactive de l'application mobile E-Santé Congo</h2>
+
+<div class="demo-shell">
+  <div>
+    <div style="display:flex; gap:8px; justify-content:center; margin-bottom:14px; flex-wrap:wrap;" id="nav-top">
+      <button class="snav-btn active-s" onclick="goScreen('home')">Accueil</button>
+      <button class="snav-btn" onclick="goScreen('consult')">Consultations</button>
+      <button class="snav-btn" onclick="goScreen('map')">Carte</button>
+      <button class="snav-btn" onclick="goScreen('prevention')">Prévention</button>
+      <button class="snav-btn" onclick="goScreen('rappels')">Rappels</button>
+      <button class="snav-btn" onclick="goScreen('poids')">Poids</button>
+    </div>
+
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+
+        <!-- ACCUEIL -->
+        <div class="screen active" id="s-home">
+          <div class="status-bar"><span>9:41</span><span>▌▌▌ 📶 🔋</span></div>
+          <div class="app-header">
+            <h1>E-Santé Congo 🌿</h1>
+            <p>Bonjour, Marie — votre santé aujourd'hui</p>
+          </div>
+          <div class="screen-body">
+            <div class="greeting-card">
+              <h2>Rappel médicament — 14h00</h2>
+              <p>Amoxicilline 500mg · Dose du midi</p>
+              <div class="badge">⏰ Dans 2h</div>
+            </div>
+            <div class="section-label">Fonctionnalités</div>
+            <div class="grid-2">
+              <div class="feature-card" onclick="goScreen('consult')">
+                <div class="icon">👨‍⚕️</div>
+                <div class="label">Consulter un médecin</div>
+              </div>
+              <div class="feature-card" onclick="goScreen('map')">
+                <div class="icon">📍</div>
+                <div class="label">Trouver une clinique</div>
+              </div>
+              <div class="feature-card" onclick="goScreen('prevention')">
+                <div class="icon">🏃</div>
+                <div class="label">Défis santé</div>
+              </div>
+              <div class="feature-card" onclick="goScreen('rappels')">
+                <div class="icon">💊</div>
+                <div class="label">Mes rappels</div>
+              </div>
+            </div>
+            <div class="section-label">Premiers secours</div>
+            <div class="list-card">
+              <div class="list-item">
+                <div class="li-icon li-red">🐍</div>
+                <div class="li-text">
+                  <div class="li-title">Morsure de serpent</div>
+                  <div class="li-sub">Que faire en cas d'urgence</div>
+                </div>
+                <div class="li-arrow">›</div>
+              </div>
+              <div class="list-item">
+                <div class="li-icon li-orange">🔥</div>
+                <div class="li-text">
+                  <div class="li-title">Brûlure grave</div>
+                  <div class="li-sub">Fiches audio téléchargeables</div>
+                </div>
+                <div class="li-arrow">›</div>
+              </div>
+              <div class="list-item">
+                <div class="li-icon li-blue">🦟</div>
+                <div class="li-text">
+                  <div class="li-title">Paludisme grave</div>
+                  <div class="li-sub">Signes d'alerte et conduite</div>
+                </div>
+                <div class="li-arrow">›</div>
+              </div>
+            </div>
+            <div class="section-label">Section Enfants</div>
+            <div class="grid-3">
+              <div class="feature-card">
+                <div class="icon">🧩</div>
+                <div class="label">Jeux éducatifs</div>
+              </div>
+              <div class="feature-card">
+                <div class="icon">📖</div>
+                <div class="label">Histoires animées</div>
+              </div>
+              <div class="feature-card">
+                <div class="icon">❓</div>
+                <div class="label">Quiz santé</div>
+              </div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item active" onclick="goScreen('home')"><div class="nav-icon"><i class="ti ti-home" aria-hidden="true"></i></div><div class="nav-label">Accueil</div><div class="nav-dot"></div></div>
+            <div class="nav-item" onclick="goScreen('consult')"><div class="nav-icon"><i class="ti ti-stethoscope" aria-hidden="true"></i></div><div class="nav-label">Médecin</div><div class="nav-dot"></div></div>
+            <div class="nav-item" onclick="goScreen('map')"><div class="nav-icon"><i class="ti ti-map-pin" aria-hidden="true"></i></div><div class="nav-label">Carte</div><div class="nav-dot"></div></div>
+            <div class="nav-item" onclick="goScreen('rappels')"><div class="nav-icon"><i class="ti ti-pill" aria-hidden="true"></i></div><div class="nav-label">Rappels</div><div class="nav-dot"></div></div>
+          </div>
+        </div>
+
+        <!-- CONSULTATIONS -->
+        <div class="screen" id="s-consult">
+          <div class="status-bar"><span>9:41</span><span>▌▌▌ 📶 🔋</span></div>
+          <div class="app-header">
+            <h1>Médecins disponibles</h1>
+            <p>Téléconsultation ou rendez-vous</p>
+          </div>
+          <div class="screen-body">
+            <div class="list-card" style="margin-bottom:8px;">
+              <div class="list-item" style="padding:5px 10px; gap:6px; background:#f9fdf9; flex-wrap:wrap;">
+                <span class="pill-tag" style="cursor:pointer">Tous</span>
+                <span class="pill-tag" style="background:#fff; border:1px solid #ccc; color:#555; cursor:pointer">Généraliste</span>
+                <span class="pill-tag" style="background:#fff; border:1px solid #ccc; color:#555; cursor:pointer">Pédiatrie</span>
+                <span class="pill-tag" style="background:#fff; border:1px solid #ccc; color:#555; cursor:pointer">Urgences</span>
+              </div>
+            </div>
+            <div class="consult-slot">
+              <div class="consult-avatar">DK</div>
+              <div class="consult-info">
+                <div class="consult-name">Dr. Daniel Kinzenza</div>
+                <div class="consult-spec">Médecin généraliste · Brazzaville</div>
+                <div class="consult-time">📹 Téléconsultation · Disponible maintenant</div>
+              </div>
+              <div class="status-dot"></div>
+            </div>
+            <div class="consult-slot">
+              <div class="consult-avatar" style="background:#2d5fa8;">ML</div>
+              <div class="consult-info">
+                <div class="consult-name">Dr. Marie-Claire Lombe</div>
+                <div class="consult-spec">Pédiatrie · Pointe-Noire</div>
+                <div class="consult-time">📅 RDV aujourd'hui à 15h30</div>
+              </div>
+              <div class="status-dot" style="background:#f59e0b;"></div>
+            </div>
+            <div class="consult-slot">
+              <div class="consult-avatar" style="background:#7b3fa0;">PN</div>
+              <div class="consult-info">
+                <div class="consult-name">Dr. Paul Nganga</div>
+                <div class="consult-spec">Médecine interne · Dolisie</div>
+                <div class="consult-time">📅 Premier créneau : demain 09h00</div>
+              </div>
+              <div class="status-dot" style="background:#9ca3af;"></div>
+            </div>
+            <div style="background:#1E5F3E; border-radius:14px; padding:13px; color:white; margin-top:8px;">
+              <div style="font-size:12px; font-weight:500;">🔒 Connexion sécurisée</div>
+              <div style="font-size:10px; opacity:0.85; margin-top:3px;">Données de santé chiffrées · Appel audio ou vidéo · Accessible hors zones urbaines</div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item" onclick="goScreen('home')"><div class="nav-icon"><i class="ti ti-home" aria-hidden="true"></i></div><div class="nav-label">Accueil</div><div class="nav-dot"></div></div>
+            <div class="nav-item active" onclick="goScreen('consult')"><div class="nav-icon"><i class="ti ti-stethoscope" aria-hidden="true"></i></div><div class="nav-label">Médecin</div><div class="nav-dot"></div></div>
+            <div class="nav-item" onclick="goScreen('map')"><div class="nav-icon"><i class="ti ti-map-pin" aria-hidden="true"></i></div><div class="nav-label">Carte</div><div class="nav-dot"></div></div>
+            <div class="nav-item" onclick="goScreen('rappels')"><div class="nav-icon"><i class="ti ti-pill" aria-hidden="true"></i></div><div class="nav-label">Rappels</div><div class="nav-dot"></div></div>
+          </div>
+        </div>
+
+        <!-- CARTE -->
+        <div class="screen" id="s-map">
+          <div class="status-bar"><span>9:41</span><span>▌▌▌ 📶 🔋</span></div>
+          <div class="app-header">
+            <h1>Cliniques & Pharmacies</h1>
+            <p>Autour de Brazzaville · GPS actif</p>
+          </div>
+          <div class="screen-body">
+            <div class="map-placeholder">
+              <div class="map-grid"></div>
+              <div class="map-pin" style="top:30%; left:40%;">🏥</div>
+              <div class="map-pin" style="top:55%; left:62%;">💊</div>
+              <div class="map-pin" style="top:45%; left:25%;">🏥</div>
+              <div class="map-pin" style="top:65%; left:48%;">💊</div>
+              <div class="map-pin" style="top:38%; left:55%; font-size:26px;">📍</div>
+              <div class="map-label">📡 Mode hors-ligne disponible</div>
+            </div>
+            <div style="display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;">
+              <span class="pill-tag" style="cursor:pointer">Tous</span>
+              <span class="pill-tag" style="background:#fff; border:1px solid #ccc; color:#555; cursor:pointer">🏥 Cliniques</span>
+              <span class="pill-tag" style="background:#fff; border:1px solid #ccc; color:#555; cursor:pointer">💊 Pharmacies</span>
+              <span class="pill-tag" style="background:#fff; border:1px solid #ccc; color:#555; cursor:pointer">⚡ Urgences</span>
+            </div>
+            <div class="list-card">
+              <div class="list-item">
+                <div class="li-icon li-green">🏥</div>
+                <div class="li-text">
+                  <div class="li-title">Clinique Centrale Brazzaville</div>
+                  <div class="li-sub">0.8 km · Ouvert · Urgences disponibles</div>
+                </div>
+                <div class="li-arrow">›</div>
+              </div>
+              <div class="list-item">
+                <div class="li-icon li-blue">💊</div>
+                <div class="li-text">
+                  <div class="li-title">Pharmacie de l'Amitié</div>
+                  <div class="li-sub">1.2 km · Ferme dans 3h · Stock confirmé</div>
+                </div>
+                <div class="li-arrow">›</div>
+              </div>
+              <div class="list-item">
+                <div class="li-icon li-green">🏥</div>
+                <div class="li-text">
+                  <div class="li-title">Centre de Santé Makélékélé</div>
+                  <div class="li-sub">2.4 km · Ouvert · Vaccination, pédiatrie</div>
+                </div>
+                <div class="li-arrow">›</div>
+              </div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item" onclick="goScreen('home')"><div class="nav-icon"><i class="ti ti-home" aria-hidden="true"></i></div><div class="nav-label">Accueil</div><div class="nav-dot"></div></div>
+            <div class="nav-item" onclick="goScreen('consult')"><div class="nav-icon"><i class="ti ti-stethoscope" aria-hidden="true"></i></div><div class="nav-label">Médecin</div><div class="nav-dot"></div></div>
+            <div class="nav-item active" onclick="goScreen('map')"><div class="nav-icon"><i class="ti ti-map-pin" aria-hidden="true"></i></div><div class="nav-label">Carte</div><div class="nav-dot"></div></div>
+            <div class="nav-item" onclick="goScreen('rappels')"><div class="nav-icon"><i class="ti ti-pill" aria-hidden="true"></i></div><div class="nav-label">Rappels</div><div class="nav-dot"></div></div>
+          </div>
+        </div>
+
+        <!-- PREVENTION -->
+        <div class="screen" id="s-prevention">
+          <div class="status-bar"><span>9:41</span><span>▌▌▌ 📶 🔋</span></div>
+          <div class="app-header">
+            <h1>Prévention & Défis</h1>
+            <p>Programme Zéro Perturbateur</p>
+          </div>
+          <div class="screen-body">
+            <div class="challenge-card">
+              <h3>🚶 7 jours de marche quotidienne</h3>
+              <p>30 minutes par jour · Défi en cours</p>
+              <div class="progress-bar"><div class="progress-fill" style="width:57%"></div></div>
+              <div class="progress-meta"><span>Jour 4 sur 7</span><span>57%</span></div>
+            </div>
+            <div class="challenge-card" style="background:linear-gradient(135deg, #2d5fa8, #4a7fd4);">
+              <h3>🚭 7 jours sans tabac</h3>
+              <p>Rejoignez 1 240 participants actifs</p>
+              <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+              <div class="progress-meta"><span>Non commencé</span><span>Commencer →</span></div>
+            </div>
+            <div class="section-label">Vidéos nutrition locale</div>
+            <div class="list-card">
+              <div class="list-item">
+                <div class="li-icon li-green">🥗</div>
+                <div class="li-text">
+                  <div class="li-title">Manger local, manger sain</div>
+                  <div class="li-sub">2 min · Lingala & Français</div>
+                </div>
+                <div class="li-arrow">▶</div>
+              </div>
+              <div class="list-item">
+                <div class="li-icon li-orange">🍌</div>
+                <div class="li-text">
+                  <div class="li-title">Les fruits du Congo pour bébé</div>
+                  <div class="li-sub">1 min 30 · Téléchargeable hors-ligne</div>
+                </div>
+                <div class="li-arrow">▶</div>
+              </div>
+            </div>
+            <div class="section-label">Exercices à domicile</div>
+            <div class="grid-3">
+              <div class="feature-card"><div class="icon">🧘</div><div class="label">Débutant</div></div>
+              <div class="feature-card"><div class="icon">🏋️</div><div class="label">Intermédiaire</div></div>
+              <div class="feature-card"><div class="icon">🧓</div><div class="label">Seniors</div></div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item" onclick="goScreen('home')"><div class="nav-icon"><i class="ti ti-home" aria-hidden="true"></i></div><div class="nav-label">Accueil</div><div class="nav-dot"></div></div>
+            <div class="nav-item" onclick="goScreen('consult')"><div class="nav-icon"><i class="ti ti-stethoscope" aria-hidden="true"></i></div><div class="nav-label">Médecin</div><div class="nav-dot"></div></div>
+            <div class="nav-item" onclick="goScreen('map')"><div class="nav-icon"><i class="ti ti-map-pin" aria-hidden="true"></i></div><div class="nav-label">Carte</div><div class="nav-dot"></div></div>
+            <div class="nav-item active" onclick="goScreen('rappels')"><div class="nav-icon"><i class="ti ti-pill" aria-hidden="true"></i></div><div class="nav-label">Rappels</div><div class="nav-dot"></div></div>
+          </div>
+        </div>
+
+        <!-- RAPPELS -->
+        <div class="screen" id="s-rappels">
+          <div class="status-bar"><span>9:41</span><span>▌▌▌ 📶 🔋</span></div>
+          <div class="app-header">
+            <h1>Mes rappels médicaments</h1>
+            <p>Notifications sonores · Fonctionne hors-ligne</p>
+          </div>
+          <div class="screen-body">
+            <div class="section-label">Aujourd'hui · Mercredi</div>
+            <div class="reminder-pill">
+              <div class="r-icon">💊</div>
+              <div class="r-info">
+                <div class="r-name">Amoxicilline 500mg</div>
+                <div class="r-time">08:00 · Prise du matin ✓</div>
+              </div>
+              <div class="r-check r-done">✓</div>
+            </div>
+            <div class="reminder-pill">
+              <div class="r-icon">🩺</div>
+              <div class="r-info">
+                <div class="r-name">Amoxicilline 500mg</div>
+                <div class="r-time">14:00 · Prise du midi — Dans 2h</div>
+              </div>
+              <div class="r-check">○</div>
+            </div>
+            <div class="reminder-pill">
+              <div class="r-icon">💉</div>
+              <div class="r-info">
+                <div class="r-name">Metformine 850mg</div>
+                <div class="r-time">20:00 · Prise du soir</div>
+              </div>
+              <div class="r-check">○</div>
+            </div>
+            <div style="background:#e8f5ee; border-radius:12px; padding:11px 13px; margin-top:10px;">
+              <div style="font-size:11px; font-weight:500; color:#1E5F3E;">📅 Calendrier vaccinal</div>
+              <div style="font-size:10px; color:#2d7a54; margin-top:3px;">Prochain rappel : BCG enfant · 15 jan 2025</div>
+            </div>
+            <div style="background:#fff3e8; border-radius:12px; padding:11px 13px; margin-top:8px;">
+              <div style="font-size:11px; font-weight:500; color:#E86A1E;">+ Ajouter un médicament</div>
+              <div style="font-size:10px; color:#b35a10; margin-top:3px;">Définir heure, fréquence, durée du traitement</div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item" onclick="goScreen('home')"><div class="nav-icon"><i class="ti ti-home" aria-hidden="true"></i></div><div class="nav-label">Accueil</div><div class="nav-dot"></div></div>
+            <div class="nav-item" onclick="goScreen('consult')"><div class="nav-icon"><i class="ti ti-stethoscope" aria-hidden="true"></i></div><div class="nav-label">Médecin</div><div class="nav-dot"></div></div>
+            <div class="nav-item" onclick="goScreen('map')"><div class="nav-icon"><i class="ti ti-map-pin" aria-hidden="true"></i></div><div class="nav-label">Carte</div><div class="nav-dot"></div></div>
+            <div class="nav-item active" onclick="goScreen('rappels')"><div class="nav-icon"><i class="ti ti-pill" aria-hidden="true"></i></div><div class="nav-label">Rappels</div><div class="nav-dot"></div></div>
+          </div>
+        </div>
+
+        <!-- POIDS / IMC -->
+        <div class="screen" id="s-poids">
+          <div class="status-bar"><span>9:41</span><span>▌▌▌ 📶 🔋</span></div>
+          <div class="app-header">
+            <h1>Gestion du poids</h1>
+            <p>Suivi IMC · Conseils nutritionnels sécurisés</p>
+          </div>
+          <div class="screen-body">
+            <div class="imc-display">
+              <div class="imc-value">22.4</div>
+              <div class="imc-label">Votre IMC</div>
+              <div class="imc-status">✅ Poids normal</div>
+            </div>
+            <div class="grid-2" style="margin-bottom:8px;">
+              <div style="background:white; border-radius:12px; padding:10px; text-align:center;">
+                <div style="font-size:18px; font-weight:500; color:#1E5F3E;">63 kg</div>
+                <div style="font-size:10px; color:#888;">Poids actuel</div>
+              </div>
+              <div style="background:white; border-radius:12px; padding:10px; text-align:center;">
+                <div style="font-size:18px; font-weight:500; color:#2d5fa8;">60 kg</div>
+                <div style="font-size:10px; color:#888;">Objectif</div>
+              </div>
+            </div>
+            <div class="list-card">
+              <div class="list-item">
+                <div class="li-icon li-green">📊</div>
+                <div class="li-text">
+                  <div class="li-title">Graphique hebdomadaire</div>
+                  <div class="li-sub">− 0.3 kg cette semaine · Sur la bonne voie</div>
+                </div>
+                <div class="li-arrow">›</div>
+              </div>
+              <div class="list-item">
+                <div class="li-icon li-blue">🥦</div>
+                <div class="li-text">
+                  <div class="li-title">Conseils nutritionnels</div>
+                  <div class="li-sub">Validés par comité médical congolais</div>
+                </div>
+                <div class="li-arrow">›</div>
+              </div>
+              <div class="list-item">
+                <div class="li-icon li-orange">📸</div>
+                <div class="li-text">
+                  <div class="li-title">Ajouter une photo de suivi</div>
+                  <div class="li-sub">Privée · Stockée sur l'appareil uniquement</div>
+                </div>
+                <div class="li-arrow">›</div>
+              </div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item" onclick="goScreen('home')"><div class="nav-icon"><i class="ti ti-home" aria-hidden="true"></i></div><div class="nav-label">Accueil</div><div class="nav-dot"></div></div>
+            <div class="nav-item" onclick="goScreen('consult')"><div class="nav-icon"><i class="ti ti-stethoscope" aria-hidden="true"></i></div><div class="nav-label">Médecin</div><div class="nav-dot"></div></div>
+            <div class="nav-item" onclick="goScreen('map')"><div class="nav-icon"><i class="ti ti-map-pin" aria-hidden="true"></i></div><div class="nav-label">Carte</div><div class="nav-dot"></div></div>
+            <div class="nav-item active" onclick="goScreen('rappels')"><div class="nav-icon"><i class="ti ti-pill" aria-hidden="true"></i></div><div class="nav-label">Rappels</div><div class="nav-dot"></div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Panneau info droit -->
+  <div class="side-info">
+    <div style="padding: 0.5rem 0 0.25rem;">
+      <div style="font-size:20px; font-weight:500; color:var(--color-text-primary);">E-Santé Congo</div>
+      <div style="font-size:13px; color:var(--color-text-secondary); margin-top:4px;">Application mobile de santé inclusive</div>
+    </div>
+
+    <div class="info-card" id="info-panel">
+      <div class="info-card-title"><i class="ti ti-home" aria-hidden="true"></i> <span id="panel-title">Vue d'ensemble</span></div>
+      <div id="panel-body"></div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-card-title"><i class="ti ti-chart-bar" aria-hidden="true"></i> KPIs clés du projet</div>
+      <div class="kpi-grid">
+        <div class="kpi-box"><div class="kv">10</div><div class="kl">modules fonctionnels</div></div>
+        <div class="kpi-box"><div class="kv">2</div><div class="kl">langues (FR + Lingala)</div></div>
+        <div class="kpi-box"><div class="kv">&lt; 50 Mo</div><div class="kl">taille de l'app</div></div>
+        <div class="kpi-box"><div class="kv">100%</div><div class="kl">fonctions hors-ligne</div></div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-card-title"><i class="ti ti-calendar" aria-hidden="true"></i> Planning indicatif</div>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div style="width:8px; height:8px; border-radius:50%; background:#1E5F3E; flex-shrink:0;"></div>
+          <span style="font-size:12px; color:var(--color-text-secondary);">Spécifications & design — <strong>1 sem.</strong></span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div style="width:8px; height:8px; border-radius:50%; background:#1E5F3E; flex-shrink:0;"></div>
+          <span style="font-size:12px; color:var(--color-text-secondary);">Développement MVP — <strong>4 sem.</strong></span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div style="width:8px; height:8px; border-radius:50%; background:#aac; flex-shrink:0;"></div>
+          <span style="font-size:12px; color:var(--color-text-secondary);">Tests utilisateurs — <strong>2 sem.</strong></span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div style="width:8px; height:8px; border-radius:50%; background:#aac; flex-shrink:0;"></div>
+          <span style="font-size:12px; color:var(--color-text-secondary);">Déploiement pilote — <strong>2 sem.</strong></span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div style="width:8px; height:8px; border-radius:50%; background:#aac; flex-shrink:0;"></div>
+          <span style="font-size:12px; color:var(--color-text-secondary);">Lancement officiel — <strong>1 sem.</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const panels = {
+  home: {
+    icon: 'ti-home', title: 'Accueil & premiers secours',
+    points: [
+      'Tableau de bord personnalisé avec rappels actifs',
+      'Accès rapide à toutes les fonctionnalités via icônes',
+      'Fiches premiers secours audio, téléchargeables hors-ligne',
+      'Section enfants : jeux, quiz, histoires animées',
+      'Interface navigable par icônes pour non-lecteurs'
+    ]
+  },
+  consult: {
+    icon: 'ti-stethoscope', title: 'Téléconsultation médicale',
+    points: [
+      'Annuaire de médecins partenaires publics et privés',
+      'Disponibilité en temps réel et statut de connexion',
+      'Prise de RDV en ligne ou téléconsultation vidéo/audio',
+      'Filtres par spécialité, localisation, disponibilité',
+      'Connexion chiffrée — données de santé sécurisées'
+    ]
+  },
+  map: {
+    icon: 'ti-map-pin', title: 'Localisation des établissements',
+    points: [
+      'Géolocalisation GPS ou saisie manuelle d\'une localité',
+      'Filtres : type, distance, services spécifiques',
+      'Disponibilité en temps réel (ouvert / fermé / complet)',
+      'Mode hors-ligne : carte et fiches téléchargeables',
+      'Respecte la vie privée : coordonnées non stockées'
+    ]
+  },
+  prevention: {
+    icon: 'ti-heart', title: 'Prévention & défis santé',
+    points: [
+      'Programme Zéro Perturbateur : tabac, alcool, sédentarité',
+      'Défis santé engageants avec suivi de progression',
+      'Vidéos courtes nutrition locale (1-2 min), hors-ligne',
+      'Exercices à domicile sans équipement, tous profils',
+      'Contenu validé par comité médical congolais'
+    ]
+  },
+  rappels: {
+    icon: 'ti-pill', title: 'Rappels & traitements',
+    points: [
+      'Notifications sonores pour prises de médicaments',
+      'Fonctionne entièrement sans connexion internet',
+      'Calendrier vaccinal personnalisé (enfants, adultes)',
+      'Gestion de plusieurs traitements simultanément',
+      'Historique des prises et taux d\'adhérence'
+    ]
+  },
+  poids: {
+    icon: 'ti-scale', title: 'Gestion du poids & IMC',
+    points: [
+      'Calculateur IMC avec interprétation claire',
+      'Objectifs personnalisés (perte ou prise de poids)',
+      'Suivi hebdomadaire avec photos et graphiques',
+      'Conseils nutritionnels sécurisés, sans régimes dangereux',
+      'Photos de suivi stockées uniquement sur l\'appareil'
+    ]
+  }
+};
+
+function goScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('s-' + name).classList.add('active');
+  document.querySelectorAll('.snav-btn').forEach((b, i) => {
+    const map = ['home','consult','map','prevention','rappels','poids'];
+    b.classList.toggle('active-s', map[i] === name);
+  });
+  const p = panels[name];
+  if (p) {
+    document.getElementById('panel-title').textContent = p.title;
+    document.querySelector('#info-panel .info-card-title i').className = 'ti ' + p.icon;
+    document.getElementById('panel-body').innerHTML = p.points.map(pt =>
+      `<div class="info-point"><div class="info-dot"></div><span>${pt}</span></div>`
+    ).join('');
+  }
+}
+
+goScreen('home');
+</script>
